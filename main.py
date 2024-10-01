@@ -2,7 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from random import randint
+from random import randint, choice
 
 load_dotenv()
 
@@ -12,22 +12,9 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-ping = False
-ping_interval = int()
-
 @bot.event
 async def on_ready() -> None:
     print(f"Logged in as {bot.user}")
-
-@bot.event
-async def ping_random(ctx) -> None:
-    mention_list = list()
-    for guild in bot.guilds:
-        for member in guild.members:
-            mention_list.append(member.mention)
-
-    i = randint(0, len(mention_list)-1)
-    await ctx.send(mention_list[i])
 
 @bot.command(name="say", help="Make the bot say something")
 async def say(ctx, *, arg):
@@ -39,15 +26,10 @@ async def roll(ctx, faces: int) -> None:
 
 @bot.command(name="ping_random", help="Pings a random person")
 async def ping_random_copy(ctx):
-    await ping_random(ctx)
+    member_list = ctx.guild.members
+    random_user = choice(member_list)
 
-@bot.command(name="ping_random_every", help="Ping a random person every 10 seconds.")
-async def ping_random_every(ctx, will_ping: str) -> None:
-    global ping 
-    if will_ping in ["true", "True"]:
-        ping = True
-    else:
-        ping = False
+    await ctx.send(random_user.mention)
 
 def main():
     token = os.getenv('TOKEN')
